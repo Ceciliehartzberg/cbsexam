@@ -16,6 +16,8 @@ import utils.Encryption;
 
 @Path("product")
 public class ProductEndpoints {
+  //for at klassen produckcahce kan kaldes, oprettes der en objekt så man kan bruge getProduct.
+  ProductCache productCache = new ProductCache();
 
   /**
    * @param idProduct
@@ -56,8 +58,6 @@ public class ProductEndpoints {
     return Response.status(200).type(MediaType.TEXT_PLAIN_TYPE).entity(json).build();
   }
 
-  //for at klassen produckcahce kan kaldes, oprettes der en objekt så man kan bruge getProduct. IKKE FÆRDIG!
-  ProductCache productCache = new ProductCache();
 
   @POST
   @Path("/")
