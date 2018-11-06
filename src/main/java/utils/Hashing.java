@@ -36,7 +36,12 @@ public final class Hashing {
 
     return null;
   }
+public static String shaSalt(String str) {
+    String salt = "vhgrejio587936";
+    String saltedPassword = str + salt;
 
+    return sha(saltedPassword);
+}
   // TODO: You should add a salt and make this secure
   public static String sha(String rawString) {
     try {
