@@ -8,9 +8,9 @@ import java.util.ArrayList;
 
 //TODO: Build this cache and use it. (vi har build it)
 public class OrderCache {
-    public class ProductCache {
 
-        // List of products
+
+        // List of orders
         private ArrayList<Order> orders;
 
         // Time cache should live
@@ -19,7 +19,7 @@ public class OrderCache {
         // Sets when the cache has been created
         private long created;
 
-        public ProductCache() {
+        public OrderCache() {
             this.ttl = Config.getOrderTtl();
         }
 
@@ -45,4 +45,4 @@ public class OrderCache {
         }
     }
 
-}
+
