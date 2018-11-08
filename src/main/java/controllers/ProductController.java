@@ -99,8 +99,12 @@ public class ProductController {
       dbCon = new DatabaseController();
     }
 
-    // TODO: Use caching layer.
+    // TODO: Use caching layer. fixed
     String sql = "SELECT * FROM product";
+
+    //tilføjet nedenstående i order og userController også
+    ProductCache productCache = new ProductCache();
+    productCache.getProducts(true);
 
     ResultSet rs = dbCon.query(sql);
     ArrayList<Product> products = new ArrayList<Product>();
@@ -138,8 +142,6 @@ public class ProductController {
       dbCon = new DatabaseController();
     }
 
-    ProductCache productCache = new ProductCache();
-    productCache.getProducts(true);
     // Insert the product in the DB
     int productID = dbCon.insert(
         "INSERT INTO product(product_name, sku, price, description, stock, created_at) VALUES('"

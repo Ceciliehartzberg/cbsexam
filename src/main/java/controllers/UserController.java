@@ -3,6 +3,8 @@ package controllers;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
+
+import cache.UserCache;
 import model.User;
 import utils.Hashing;
 import utils.Log;
@@ -24,6 +26,9 @@ public class UserController {
 
     // Build the query for DB
     String sql = "SELECT * FROM user where id=" + id;
+
+    UserCache userCache = new UserCache();
+    userCache.getUsers(true);
 
     // Actually do the query
     ResultSet rs = dbCon.query(sql);
