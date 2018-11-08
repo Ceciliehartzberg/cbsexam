@@ -3,6 +3,8 @@ package controllers;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
+
+import cache.ProductCache;
 import model.Product;
 import utils.Log;
 
@@ -136,6 +138,8 @@ public class ProductController {
       dbCon = new DatabaseController();
     }
 
+    ProductCache productCache = new ProductCache();
+    productCache.getProducts(true);
     // Insert the product in the DB
     int productID = dbCon.insert(
         "INSERT INTO product(product_name, sku, price, description, stock, created_at) VALUES('"
