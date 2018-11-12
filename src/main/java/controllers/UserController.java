@@ -8,6 +8,9 @@ import cache.UserCache;
 import model.User;
 import utils.Hashing;
 import utils.Log;
+import com.auth0.jwt.algorithms.Algorithm;
+import com.auth0.jwt.JWT;
+import com.auth0.jwt.exceptions.JWTCreationException;
 
 public class UserController {
 
@@ -56,6 +59,59 @@ public class UserController {
 
     // Return null
     return user;
+  }
+
+  public static String getLogin(User user) {
+
+    // Check for connection
+    if (dbCon == null) {
+      dbCon = new DatabaseController();
+    }
+
+    // Build the query for DB
+    String sql = "SELECT * FROM user where email=" + user.getEmail()+"AND password" + Hashing.shaSalt(user.getPassword());
+
+    // Actually do the query
+    ResultSet rs = dbCon.query(sql);
+    User loginUser = null;
+
+    String token = null;
+
+    try {
+      // Get first object, since we only have one
+      if (rs.next()) {
+        user =
+                new User(
+                        rs.getInt("id"),
+                        rs.getString("first_name"),
+                        rs.getString("last_name"),
+                        rs.getString("password"),
+                        rs.getString("email"));
+
+        // return the create object
+        if (loginUser != null){
+          try {
+            Algorithm algorithm = Algorithm.HMAC256("secret");
+            token = JWT.create()
+                    .withClaim("userId",user.getId())
+                    .withIssuer("auth0")
+                    .sign(algorithm);
+          } catch (JWTCreationException exception){
+            //Invalid Signing configuration / Couldn't convert Claims.
+          }
+          finally {
+            return token;
+          }
+        }
+      } else {
+        System.out.println("No user found");
+      }
+    } catch (SQLException ex) {
+      System.out.println(ex.getMessage());
+    }
+
+    // Return null
+    return "";
   }
 
   /**

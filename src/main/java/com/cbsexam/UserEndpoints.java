@@ -31,15 +31,23 @@ public class UserEndpoints {
     // Use the ID to get the user from the controller.
     User user = UserController.getUser(idUser);
 
-    // TODO: Add Encryption to JSON fixed
+    // TODO: Add Encryption to JSON FIXED
     // Convert the user object to json in order to return the object
     String json = new Gson().toJson(user);
 
     json= Encryption.encryptDecryptXOR(json);
 
     // Return the user with the status code 200
-    // TODO: What should happen if something breaks down?
-    return Response.status(200).type(MediaType.APPLICATION_JSON_TYPE).entity(json).build();
+    // TODO: What should happen if something breaks down? FIXED
+
+    if (user != null){
+      //Return the user with the status code 200 - succesfull
+      return Response.status(200).type(MediaType.APPLICATION_JSON_TYPE).entity(json).build();
+    } else {
+      //return the code with the status code 400 - client error
+      return Response.status(400).entity("could not find user,try again").build();
+    }
+
   }
 
 
@@ -85,14 +93,24 @@ public class UserEndpoints {
     }
   }
 
-  // TODO: Make the system able to login users and assign them a token to use throughout the system.
+  // TODO: Make the system able to login users and assign them a token to use throughout the system. FIXED
   @POST
   @Path("/login")
   @Consumes(MediaType.APPLICATION_JSON)
-  public Response loginUser(String x) {
+  public Response loginUser(String body) {
+
+    User user = new Gson().fromJson(body,User.class);
+
+    String token = UserController.getLogin(user);
 
     // Return a response with status 200 and JSON as type
-    return Response.status(400).entity("Endpoint not implemented yet").build();
+    if (token != ""){
+      //Return the user with the status code 200 - succesfull
+      return Response.status(200).type(MediaType.APPLICATION_JSON_TYPE).entity(token).build();
+    } else {
+      //return the code with the status code 400 - client error
+      return Response.status(400).entity("could not find user,try again").build();
+    }
   }
 
   // TODO: Make the system able to delete users
