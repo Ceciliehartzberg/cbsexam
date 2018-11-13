@@ -113,9 +113,9 @@ public class UserEndpoints {
     }
   }
 
-  // TODO: Make the system able to delete users
+  // TODO: Make the system able to delete users FIXED
   @POST
-  @Path("/delete")
+  @Path("delete")
   @Consumes(MediaType.APPLICATION_JSON)
   public Response deleteUser(String body) {
 
@@ -126,11 +126,12 @@ public class UserEndpoints {
       UserController.deleteUser(user);
 
     // Return a response with status 200 and JSON as type
-      return Response.status(200).type(MediaType.APPLICATION_JSON_TYPE.entity("User is deleted").build();
+      return Response.status(200).type(MediaType.APPLICATION_JSON_TYPE).entity("User is deleted").build();
   } else {
       //Return a response with status 400 and JSON as type
       return Response.status(400).entity("Endpoint not implemented yet").build();
     }
+  }
 
   // TODO: Make the system able to update users
   public Response updateUser(String x) {

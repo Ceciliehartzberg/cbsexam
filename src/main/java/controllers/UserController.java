@@ -1,5 +1,6 @@
 package controllers;
 
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -45,12 +46,12 @@ public class UserController {
       // Get first object, since we only have one
       if (rs.next()) {
         user =
-            new User(
-                rs.getInt("id"),
-                rs.getString("first_name"),
-                rs.getString("last_name"),
-                rs.getString("password"),
-                rs.getString("email"));
+                new User(
+                        rs.getInt("id"),
+                        rs.getString("first_name"),
+                        rs.getString("last_name"),
+                        rs.getString("password"),
+                        rs.getString("email"));
 
         // return the create object
         return user;
@@ -73,7 +74,7 @@ public class UserController {
     }
 
     // Build the query for DB
-    String sql = "SELECT * FROM user where email=" + user.getEmail()+"AND password" + Hashing.shaSalt(user.getPassword());
+    String sql = "SELECT * FROM user where email=" + user.getEmail() + "AND password" + Hashing.shaSalt(user.getPassword());
 
     // Actually do the query
     ResultSet rs = dbCon.query(sql);
@@ -93,17 +94,16 @@ public class UserController {
                         rs.getString("email"));
 
         // return the create object
-        if (loginUser != null){
+        if (loginUser != null) {
           try {
             Algorithm algorithm = Algorithm.HMAC256("secret");
             token = JWT.create()
-                    .withClaim("userId",user.getId())
+                    .withClaim("userId", user.getId())
                     .withIssuer("auth0")
                     .sign(algorithm);
-          } catch (JWTCreationException exception){
+          } catch (JWTCreationException exception) {
             //Invalid Signing configuration / Couldn't convert Claims.
-          }
-          finally {
+          } finally {
             return token;
           }
         }
@@ -141,12 +141,12 @@ public class UserController {
       // Loop through DB Data
       while (rs.next()) {
         User user =
-            new User(
-                rs.getInt("id"),
-                rs.getString("first_name"),
-                rs.getString("last_name"),
-                rs.getString("password"),
-                rs.getString("email"));
+                new User(
+                        rs.getInt("id"),
+                        rs.getString("first_name"),
+                        rs.getString("last_name"),
+                        rs.getString("password"),
+                        rs.getString("email"));
 
         // Add element to list
         users.add(user);
@@ -175,22 +175,22 @@ public class UserController {
     // Insert the user in the DB
     // TODO: Hash the user password before saving it. FIXED
     int userID = dbCon.insert(
-        "INSERT INTO user(first_name, last_name, password, email, created_at) VALUES('"
-            + user.getFirstname()
-            + "', '"
-            + user.getLastname()
-            + "', '"
-            + Hashing.shaSalt(user.getPassword())
-            + "', '"
-            + user.getEmail()
-            + "', "
-            + user.getCreatedTime()
-            + ")");
+            "INSERT INTO user(first_name, last_name, password, email, created_at) VALUES('"
+                    + user.getFirstname()
+                    + "', '"
+                    + user.getLastname()
+                    + "', '"
+                    + Hashing.shaSalt(user.getPassword())
+                    + "', '"
+                    + user.getEmail()
+                    + "', "
+                    + user.getCreatedTime()
+                    + ")");
 
     if (userID != 0) {
       //Update the userid of the user before returning
       user.setId(userID);
-    } else{
+    } else {
       // Return null if user has not been inserted into database
       return null;
     }
@@ -198,6 +198,23 @@ public class UserController {
     // Return user
     return user;
   }
+
+  public static User deleteUser(User user) {
+    if (dbCon == null) {
+      dbCon = new DatabaseController();
+    }
+
+    try {
+      PreparedStatement deleteUser = dbCon.getConnection().prepareStatement("DELETE FROM user WHERE id= ?");
+      deleteUser.setInt(1, user.getId());
+
+      deleteUser.executeUpdate();
+    } catch (SQLException sql){
+      sql.getStackTrace();
+    }
+    return user;
+    }
+
   public static String getTokenVerifier(User user) {
     //Checking for connection to DB
     if (dbCon == null) {
@@ -222,7 +239,7 @@ public class UserController {
                         rs.getString("last name"),
                         rs.getString("password"),
                         rs.getString("email"));
-        if (sessionToken !=null){
+        if (sessionToken != null) {
           try {
             Algorithm algorithm = Algorithm.HMAC256("secret");
             JWTVerifier verifier = JWT.require(algorithm)
@@ -235,7 +252,7 @@ public class UserController {
               return token;
             }
 
-          } catch (JWTVerificationException e){
+          } catch (JWTVerificationException e) {
             System.out.println(e.getMessage());
             //invalid singing configuration / could not convert claims
           }
@@ -250,3 +267,4 @@ public class UserController {
     return ("");
   }
 }
+
