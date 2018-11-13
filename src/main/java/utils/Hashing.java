@@ -42,7 +42,7 @@ public static String shaSalt(String str) {
 
     return sha(saltedPassword);
 }
-  // TODO: You should add a salt and make this secure fixed
+  // TODO: You should add a salt and make this secure FIXED
   public static String sha(String rawString) {
     try {
       // We load the hashing algoritm we wish to use.

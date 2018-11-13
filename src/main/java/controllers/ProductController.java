@@ -99,7 +99,7 @@ public class ProductController {
       dbCon = new DatabaseController();
     }
 
-    // TODO: Use caching layer. fixed
+    // TODO: Use caching layer. FIXED
     String sql = "SELECT * FROM product";
 
     //tilføjet nedenstående i order og userController også

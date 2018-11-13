@@ -5,6 +5,10 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 
 import cache.UserCache;
+import com.auth0.jwt.JWTVerifier;
+import com.auth0.jwt.exceptions.JWTVerificationException;
+import com.auth0.jwt.interfaces.Claim;
+import com.auth0.jwt.interfaces.DecodedJWT;
 import model.User;
 import utils.Hashing;
 import utils.Log;
@@ -169,7 +173,7 @@ public class UserController {
     }
 
     // Insert the user in the DB
-    // TODO: Hash the user password before saving it. fixed
+    // TODO: Hash the user password before saving it. FIXED
     int userID = dbCon.insert(
         "INSERT INTO user(first_name, last_name, password, email, created_at) VALUES('"
             + user.getFirstname()
@@ -193,5 +197,56 @@ public class UserController {
 
     // Return user
     return user;
+  }
+  public static String getTokenVerifier(User user) {
+    //Checking for connection to DB
+    if (dbCon == null) {
+      dbCon = new DatabaseController();
+
+    }
+    //building the query for DB
+    String sql = "SELECT * FROM user WHERE id=" + user.getId();
+
+    // this is where the query executes
+    ResultSet rs = dbCon.query(sql);
+    User sessionToken;
+    String token = user.getToken();
+
+    try {
+      // Get first object since we only have one
+      if (rs.next()) {
+        sessionToken =
+                new User(
+                        rs.getInt("id"),
+                        rs.getString("first name"),
+                        rs.getString("last name"),
+                        rs.getString("password"),
+                        rs.getString("email"));
+        if (sessionToken !=null){
+          try {
+            Algorithm algorithm = Algorithm.HMAC256("secret");
+            JWTVerifier verifier = JWT.require(algorithm)
+                    .withIssuer("aut0")
+                    .build();
+            DecodedJWT jwt = verifier.verify(token);
+            Claim claim = jwt.getClaim("userID");
+
+            if (user.getId() == claim.asInt()) {
+              return token;
+            }
+
+          } catch (JWTVerificationException e){
+            System.out.println(e.getMessage());
+            //invalid singing configuration / could not convert claims
+          }
+        }
+      } else {
+        System.out.println("No user found");
+      }
+    } catch (SQLException ex) {
+      System.out.println(ex.getMessage());
+    }
+    //return null
+    return ("");
   }
 }
