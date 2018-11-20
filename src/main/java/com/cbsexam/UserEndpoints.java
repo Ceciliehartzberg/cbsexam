@@ -134,6 +134,7 @@ public class UserEndpoints {
   }
 
   // TODO: Make the system able to update users
+  // skal bruge token
   public Response updateUser(String x) {
 
     // Return a response with status 200 and JSON as type

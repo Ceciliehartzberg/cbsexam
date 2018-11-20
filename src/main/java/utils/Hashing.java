@@ -35,7 +35,7 @@ public final class Hashing {
     }
 
     return null;
-    //Har gemt det saltede kodeord i min config.json, derfor vi getter SALT nedenfor
+    //Har gemt det saltede password i min config.json, derfor vi getter SALT nedenfor
   }
 public static String shaSalt(String str) {
     String salt = Config.getSALT();
