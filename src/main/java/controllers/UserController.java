@@ -266,5 +266,27 @@ public class UserController {
     //return null
     return ("");
   }
-}
+  public static  User update (User user) {
+    // check for DB connection
+    if ( (dbCon==null)) {
+      dbCon= new DatabaseController();
+    }
+    try {
+      PreparedStatement updateUser = dbCon.getConnection().prepareStatement("UPDATE user SET first_name = ?, last_name = ?, email = ? WHERE id ? ?");
+
+      updateUser.setString(1, user.getFirstname());
+      updateUser.setString(2, user.getLastname());
+      updateUser.setString(3, Hashing.shaSalt(user.getPassword()));
+      updateUser.setString(4, user.getEmail());
+      updateUser.setInt(5, user.getId());
+
+      updateUser.executeUpdate();
+
+    } catch (SQLException e){
+      e.printStackTrace();
+    }
+    return user;
+  }
+
+  }
 

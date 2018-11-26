@@ -62,7 +62,7 @@ public class UserEndpoints {
     // Get a list of users
     ArrayList<User> users = userCache.getUsers(true);
 
-    // TODO: Add Encryption to JSON fixed
+    // TODO: Add Encryption to JSON FIXED
     // Transfer users to json in order to return it to the user
     String json = new Gson().toJson(users);
 
@@ -135,9 +135,19 @@ public class UserEndpoints {
 
   // TODO: Make the system able to update users
   // skal bruge token
-  public Response updateUser(String x) {
+  public Response updateUser(String body) {
+    User user = new Gson().fromJson(body, User.class);
+    String token = UserController.getTokenVerifier(user);
 
-    // Return a response with status 200 and JSON as type
-    return Response.status(400).entity("Endpoint not implemented yet").build();
+    if (token !="") {
+      UserController.update(user);
+      // Return a response with status 200 and JSON as type
+      return Response.status(200).type(MediaType.APPLICATION_JSON_TYPE).entity("User is updated").build();
+    } else {
+      //Return a response with status 400 and JSON as type
+      return Response.status(400).entity("Endpoint not implemented yet").build();
+    }
+
+
   }
 }
