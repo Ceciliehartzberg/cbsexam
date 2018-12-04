@@ -246,7 +246,7 @@ public class UserController {
                     .withIssuer("aut0")
                     .build();
             DecodedJWT jwt = verifier.verify(token);
-            Claim claim = jwt.getClaim("userID");
+            Claim claim = jwt.getClaim("userId");
 
             if (user.getId() == claim.asInt()) {
               return token;
