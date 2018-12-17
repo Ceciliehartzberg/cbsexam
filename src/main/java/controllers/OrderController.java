@@ -28,7 +28,7 @@ public class OrderController {
     }
 
     // Build SQL string to query
-    String sql = "SELECT * FROM orders where id=" + id;
+    String sql = "SELECT * FROM order where id=" + id;
 
     OrderCache orderCache = new OrderCache();
     orderCache.getOrders(true);
@@ -82,7 +82,7 @@ public class OrderController {
       dbCon = new DatabaseController();
     }
 
-    String sql = "SELECT * FROM order";
+    String sql = "SELECT * FROM orders";
 
     ResultSet rs = dbCon.query(sql);
     ArrayList<Order> orders = new ArrayList<Order>();

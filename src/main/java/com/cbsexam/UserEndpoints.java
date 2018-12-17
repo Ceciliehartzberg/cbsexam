@@ -4,21 +4,20 @@ import cache.UserCache;
 import com.google.gson.Gson;
 import controllers.UserController;
 import java.util.ArrayList;
-import javax.ws.rs.Consumes;
-import javax.ws.rs.GET;
-import javax.ws.rs.POST;
-import javax.ws.rs.Path;
-import javax.ws.rs.PathParam;
+import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import model.User;
 import utils.Log;
 import utils.Encryption;
+import utils.Token;
 
 @Path("user")
 public class UserEndpoints {
   //indsæt kommentar
   UserCache userCache = new UserCache();
+
+  private static boolean forceUpdate = true;
 
   /**
    * @param idUser
@@ -93,61 +92,79 @@ public class UserEndpoints {
     }
   }
 
-  // TODO: Make the system able to login users and assign them a token to use throughout the system. FIXED
+  // TODO: Make the system able to login users and assign them a token to use throughout the system. (Fixed)
   @POST
   @Path("/login")
   @Consumes(MediaType.APPLICATION_JSON)
   public Response loginUser(String body) {
 
-    User user = new Gson().fromJson(body,User.class);
+    User userToBe = new Gson().fromJson(body, User.class);
 
-    String token = UserController.getLogin(user);
+    User user = UserController.getLogin(userToBe);
 
-    // Return a response with status 200 and JSON as type
-    if (token != ""){
-      //Return the user with the status code 200 - succesfull
-      return Response.status(200).type(MediaType.APPLICATION_JSON_TYPE).entity(token).build();
-    } else {
-      //return the code with the status code 400 - client error
-      return Response.status(400).entity("could not find user,try again").build();
-    }
-  }
-
-  // TODO: Make the system able to delete users FIXED
-  @POST
-  @Path("delete")
-  @Consumes(MediaType.APPLICATION_JSON)
-  public Response deleteUser(String body) {
-
-    User user = new Gson().fromJson(body, User.class);
-    String token = UserController.getTokenVerifier(user);
-
-    if (token != null) {
-      UserController.deleteUser(user);
-
-    // Return a response with status 200 and JSON as type
-      return Response.status(200).type(MediaType.APPLICATION_JSON_TYPE).entity("User is deleted").build();
-  } else {
-      //Return a response with status 400 and JSON as type
-      return Response.status(400).entity("Endpoint not implemented yet").build();
-    }
-  }
-
-  // TODO: Make the system able to update users
-  // skal bruge token
-  public Response updateUser(String body) {
-    User user = new Gson().fromJson(body, User.class);
-    String token = UserController.getTokenVerifier(user);
-
-    if (token !="") {
-      UserController.update(user);
+    if (user != null) {
+      String msg = "Helloooo"+user.getFirstname()+ "\n\n this is your profile: \n\n" +user.getToken() + " Good day! ";
       // Return a response with status 200 and JSON as type
-      return Response.status(200).type(MediaType.APPLICATION_JSON_TYPE).entity("User is updated").build();
+      return Response.status(200).type(MediaType.APPLICATION_JSON_TYPE).entity(msg).build();
     } else {
-      //Return a response with status 400 and JSON as type
+      // If it breaks down a message 400 will appear
       return Response.status(400).entity("Endpoint not implemented yet").build();
     }
-
-
   }
+
+  // TODO: Make the system able to delete users (Fixed)
+  @DELETE
+  @Path("/{idUser}")
+  @Consumes(MediaType.APPLICATION_JSON)
+  public Response deleteUser(@PathParam("idUser") int idUser, String body) {
+
+    User user = new Gson().fromJson(body, User.class);
+
+    Log.writeLog(this.getClass().getName(), this, "Deleting a user", 0);
+
+    if (Token.verifyToken(user.getToken(), user)) {
+      boolean deleted = UserController.deleteUser(idUser);
+
+      if (deleted) {
+        forceUpdate = true;
+        // Return a response with status 200 and a massage
+        return Response.status(200).type(MediaType.APPLICATION_JSON_TYPE).entity("User deleted").build();
+      } else {
+        // Return a response with status 200 and a message
+        return Response.status(400).entity("Could not delete user ").build();
+      }
+    }
+    return null;
+  }
+  // TODO: Make the system able to update users (Fixed)
+  @PUT
+  @Path("/update/{idUser}")
+  @Consumes(MediaType.APPLICATION_JSON)
+  public Response updateUser(@PathParam("idUser") int idUser, String body){
+
+    User user1= new Gson().fromJson(body, User.class);
+
+    //Writing log to let know we are here.
+    Log.writeLog(this.getClass().getName(), this, "Updating a user", 0);
+
+    if (Token.verifyToken(user1.getToken(), user1)) {
+      boolean affected = UserController.updateUser(user1);
+
+
+      if (affected ) {
+        forceUpdate = true;
+        String json = new Gson().toJson(user1);
+
+        //Returning responses to user
+        return Response.status(200).type(MediaType.APPLICATION_JSON_TYPE).entity(json).build();
+      } else {
+        return Response.status(400).entity("Could not update user").build();
+      }
+    } else {
+      //If the token verifier does not check out.
+      return Response.status(401).entity("You're not authorized to do this - please log in").build();
+    }
+  }
+
+
 }

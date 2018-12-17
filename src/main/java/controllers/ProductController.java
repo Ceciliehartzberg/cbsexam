@@ -103,8 +103,7 @@ public class ProductController {
     String sql = "SELECT * FROM product";
 
     //tilføjet nedenstående i order og userController også
-    ProductCache productCache = new ProductCache();
-    productCache.getProducts(true);
+
 
     ResultSet rs = dbCon.query(sql);
     ArrayList<Product> products = new ArrayList<Product>();
@@ -114,7 +113,7 @@ public class ProductController {
         Product product =
             new Product(
                 rs.getInt("id"),
-                rs.getString("name"),
+                rs.getString("product_name"),
                 rs.getString("sku"),
                 rs.getFloat("price"),
                 rs.getString("description"),
@@ -152,11 +151,11 @@ public class ProductController {
             + product.getPrice()
             + "', '"
             + product.getDescription()
-            + "', "
+            + "', '"
             + product.getStock()
-            + "', "
+            + "', '"
             + product.getCreatedTime()
-            + ")");
+            + "')");
 
     if (productID != 0) {
       //Update the productid of the product before returning

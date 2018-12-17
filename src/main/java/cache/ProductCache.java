@@ -29,7 +29,7 @@ public class ProductCache {
     //skriver == null i stedet for is empty
     if (forceUpdate
         || ((this.created + this.ttl) <= (System.currentTimeMillis() / 1000L))
-        || this.products == null) {
+        || this.products.isEmpty()) {
 
       // Get products from controller, since we wish to update.
       ArrayList<Product> products = ProductController.getProducts();

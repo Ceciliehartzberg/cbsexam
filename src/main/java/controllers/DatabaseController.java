@@ -110,4 +110,49 @@ public class DatabaseController {
     // Return the resultset which at this point will be null
     return result;
   }
+
+  public boolean update (String sql) {
+
+    //
+    if (connection == null)
+      connection = getConnection();
+
+    try {
+      PreparedStatement preparedStatement = connection.prepareStatement(sql);
+
+      int rowaffected = preparedStatement.executeUpdate();
+
+      if (rowaffected==1)
+        return true;
+
+    } catch (SQLException e) {
+      e.printStackTrace();
+    }
+
+    return false;
+  }
+
+  public boolean delete(String sql) {
+
+    // Check that we have connection
+    if (connection == null)
+      connection = getConnection();
+
+    try {
+      // Build the statement as a prepared statement
+      PreparedStatement stmt = connection.prepareStatement(sql);
+
+
+      int rowsAffected = stmt.executeUpdate();
+
+      if (rowsAffected == 1) {
+        return true;
+      }
+    } catch (SQLException sqlException) {
+      sqlException.printStackTrace();
+    }
+    return false;
+  }
+
 }
+
