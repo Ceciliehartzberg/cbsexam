@@ -16,8 +16,8 @@ import utils.Encryption;
 
 @Path("order")
 public class OrderEndpoints {
-  // tilføj kommentar til dette
-  OrderCache orderCache = new OrderCache();
+  // se afsnit om cache i rapport
+  public static OrderCache orderCache = new OrderCache();
 
   /**
    * @param idOrder
